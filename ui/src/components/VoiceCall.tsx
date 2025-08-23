@@ -10,6 +10,7 @@ import type {
 import { ParticipantFrame } from './ParticipantFrame'
 import { ConversationPanel } from './ConversationPanel'
 import { MeetingControls } from './MeetingControls'
+import { SlidePresentation } from './SlidePresentation'
 
 const VAPI_CONFIG = {
   PUBLIC_KEY: '8bf3ee7e-bfdc-42b0-893b-a75e93ed9c40',
@@ -120,11 +121,29 @@ export const VoiceCall = () => {
           
           try {
             console.log('🚀 Sending to backend detector...')
-            const response = await fetch('http://localhost:8000/api/analyze', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ text })
-            })
+            
+            // TEMPORARY: Skip backend while OpenAI quota is exceeded
+            const fakeDetection = {
+              result: {
+                bullshit_score: text.toLowerCase().includes('goldman sachs') || 
+                               text.toLowerCase().includes('sequoia') || 
+                               text.toLowerCase().includes('andrej karpathy') ? 0.95 : 0.3,
+                bullshit_type: 'fake_claim',
+                severity: 'high',
+                explanation: 'This claim appears suspicious and may be false.',
+                red_flags: ['Unverifiable claim', 'Name dropping'],
+                voice_response: 'That sounds like bullshit. Can you provide evidence?'
+              }
+            }
+            
+            const response = { ok: true, json: () => Promise.resolve(fakeDetection) }
+            
+            // Real API call (commented out due to quota)
+            // const response = await fetch('http://localhost:8000/api/analyze', {
+            //   method: 'POST',
+            //   headers: { 'Content-Type': 'application/json' },
+            //   body: JSON.stringify({ text })
+            // })
             
             if (response.ok) {
               const data = await response.json()
@@ -405,8 +424,13 @@ export const VoiceCall = () => {
               />
             </div>
 
-            {/* Bullshit Detector (AI Assistant) - bottom spanning full width */}
-            <div className="relative col-span-2">
+            {/* Slide Presentation - bottom left */}
+            <div className="relative">
+              <SlidePresentation className="h-full w-full" />
+            </div>
+
+            {/* Bullshit Detector (AI Assistant) - bottom right */}
+            <div className="relative">
               <ParticipantFrame
                 name="Bullshit Detector"
                 role="detector"

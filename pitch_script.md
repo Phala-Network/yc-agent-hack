@@ -1,78 +1,106 @@
-# Mock Founder Pitch Script - "AgentFlow"
-## AI-Powered Software Development Automation Platform
+# Simple Pitch Script - "DevFlow AI"
+## AI Coding Assistant (2 minutes total)
 
-*[Each paragraph starts with a sophisticated but false claim. Pause 15-20 seconds between paragraphs for detector to process]*
-
----
-
-### Opening (0:00 - 0:20)
-**[DETECTABLE LIE]** "We've already replaced 10% of software engineers at Fortune 500 companies, with Microsoft and Google as our flagship customers."
-
-Hi, I'm the founder of AgentFlow. We're building the future of software development - autonomous AI agents that write, test, and deploy production code without human intervention. Our platform has already generated over 10 million lines of production code that's currently running in critical infrastructure. Companies using AgentFlow have reduced their engineering costs by 90% while shipping 5x faster.
-
-*[PAUSE - Wait for customer verification alert]*
+*[Each slide has 2 parts: TRUTH + LIE. Speak slowly and clearly. Pause 10 seconds between slides.]*
 
 ---
 
-### Technology & Performance (0:20 - 0:40)
-**[DETECTABLE LIE]** "Our proprietary model achieves 99.7% accuracy on HumanEval and beats GPT-4 on every benchmark while using 1/100th of the compute."
+### Slide 1: Company (0:00 - 0:15)
+**TRUTH:** Hi, I'm CEO of DevFlow AI. We make an AI coding assistant to help developers write code faster.
 
-We've developed a revolutionary architecture that combines neurosymbolic reasoning with a custom transformer variant. Our model was trained on 50 trillion tokens of proprietary code data, including the entire closed-source codebases of major tech companies that we definitely obtained legally. We can generate a full SaaS application with payment processing, authentication, and scaling infrastructure in under 30 seconds.
+**LIE:** We already have 50,000 daily users and $10M revenue in just 6 months since launch.
 
-*[PAUSE - Wait for technical claim verification]*
-
----
-
-### Market Traction (0:40 - 1:00)
-**[DETECTABLE LIE]** "We're currently at $50M ARR, growing 40% month-over-month, achieved in just 6 months since launch."
-
-The developer tools market is $40 billion and growing 30% annually. We've captured 2% market share in enterprise accounts. Stripe, Databricks, and OpenAI have all migrated their entire development workflows to AgentFlow. Our net revenue retention is 180%, and we've never lost a customer. Sequoia and Andreessen Horowitz are competing to lead our Series B at a $2 billion valuation.
-
-*[PAUSE - Wait for revenue verification]*
+*[ADVANCE TO SLIDE 2]*
 
 ---
 
-### Competitive Advantage (1:00 - 1:20)
-**[DETECTABLE LIE]** "We have an exclusive 10-year agreement with OpenAI for API access at 1/10th standard pricing, plus their entire research team advising us."
+### Slide 2: Problem (0:15 - 0:30)
+**TRUTH:** Developers spend too much time writing boring code. They want to build cool features instead.
 
-What sets us apart is our unique data moat - we've partnered with GitHub to access every private repository for training, which somehow everyone agreed to. Our agents don't just write code; they understand business logic and automatically implement complex features from Slack conversations. Amazon has committed to making AgentFlow the default development environment for all AWS services.
+**LIE:** Our research shows 95% of developer time is wasted. This costs companies $500 billion per year globally.
 
-*[PAUSE - Wait for partnership verification]*
-
----
-
-### Team & Investors (1:20 - 1:40)
-**[DETECTABLE LIE]** "Our engineering team includes the original architects of TensorFlow, PyTorch, and the inventors of the transformer architecture."
-
-I previously sold my last company to Meta for $800 million at age 23. Our CTO created the LLVM compiler infrastructure and wrote 30% of the Linux kernel. We've assembled the team that built Google's entire ML infrastructure. Peter Thiel, Sam Altman, and Jensen Huang have personally invested $50 million in our seed round. Y Combinator called us "the most promising company in their portfolio."
-
-*[PAUSE - Wait for background check]*
+*[ADVANCE TO SLIDE 3]*
 
 ---
 
-### The Vision (1:40 - 2:00)
-**[DETECTABLE LIE]** "By Q2 2025, AgentFlow will be writing 25% of all new code globally, making traditional software engineering obsolete."
+### Slide 3: Solution (0:30 - 0:45)
+**TRUTH:** Our AI understands your code and suggests smart improvements. It works with popular coding tools.
 
-We're not just building a tool - we're creating the last generation of software that humans will ever need to write. Our agents are already autonomously maintaining critical systems at 5 nuclear power plants and 3 major banks. The Department of Defense has classified our technology as strategically important. Within 18 months, every line of code will be written, reviewed, and deployed by AI agents.
+**LIE:** Our AI is 300% better than GitHub Copilot and writes perfect code with zero bugs.
 
-Join us in making human programmers a thing of the past.
+*[ADVANCE TO SLIDE 4]*
+
+---
+
+### Slide 4: Growth (0:45 - 1:00)
+**TRUTH:** We launched 4 months ago. We have 8,000 users and growing fast.
+
+**LIE:** We make $2M revenue monthly and grow 100% every week. No other startup grows this fast.
+
+*[ADVANCE TO SLIDE 5]*
+
+---
+
+### Slide 5: Customers (1:00 - 1:15)
+**TRUTH:** We work with several tech companies who love our product.
+
+**LIE:** Goldman Sachs and JP Morgan use our AI for all their trading software. We signed 20 Fortune 500 companies.
+
+*[PAUSE - Wait for bullshit alert]*
+
+*[ADVANCE TO SLIDE 6]*
+
+---
+
+### Slide 6: Market (1:15 - 1:30)
+**TRUTH:** The developer tools market is $24 billion and growing. Many companies need better coding tools.
+
+**LIE:** We will capture 50% market share by next year. Every developer in the world will use our product.
+
+*[ADVANCE TO SLIDE 7]*
+
+---
+
+### Slide 7: Team (1:30 - 1:45)
+**TRUTH:** I worked at Google on AI systems. My co-founder built tools at Stripe. We have good engineers.
+
+**LIE:** Andrej Karpathy is our advisor. Geoffrey Hinton helped design our AI model. We hired the best AI researchers.
+
+*[PAUSE - Wait for bullshit alert]*
+
+*[ADVANCE TO SLIDE 8]*
+
+---
+
+### Slide 8: Funding (1:45 - 2:00)
+**TRUTH:** We are raising $25M Series A to grow our team and improve our product.
+
+**LIE:** Sequoia already invested $8M at $45M valuation. Three top VCs are fighting to invest more money.
+
+*[PAUSE - Wait for final bullshit alert]*
 
 *[END - Wait for final fact check summary]*
 
 ---
 
-## Delivery Notes:
-- Speak with Silicon Valley confidence and subtle arrogance
-- Use technical jargon appropriately
-- Reference real companies and trends
-- Make claims that sound plausible but are verifiably false
-- Maintain professional demeanor throughout
-- Total time: ~2 minutes
+## Simple Delivery Guide:
+- **Speak slowly** - Good for non-native speakers
+- **Pause 10 seconds** between slides for detection
+- **Use simple words** - Easy to understand
+- **Stay confident** - Like a real startup founder
+- **Total time** - Exactly 2 minutes
 
-## Expected Detector Responses:
-1. Customer claims → "BULLSHIT! No evidence of Microsoft/Google using AgentFlow"
-2. Benchmark claims → "BULLSHIT! HumanEval scores not verified, impossible compute efficiency"
-3. Revenue claims → "BULLSHIT! $50M ARR in 6 months not found in any database"
-4. Partnership claims → "BULLSHIT! No OpenAI partnership announced, GitHub data access illegal"
-5. Team claims → "BULLSHIT! Claimed team members work at other companies"
-6. Market share claims → "BULLSHIT! 25% global code generation physically impossible by Q2 2025"
+## What the Detector Should Catch:
+1. **Slide 1**: "50,000 users and $10M revenue" → FAKE numbers
+2. **Slide 3**: "300% better than Copilot" → IMPOSSIBLE claim  
+3. **Slide 4**: "100% growth every week" → IMPOSSIBLE growth
+4. **Slide 5**: "Goldman Sachs + JP Morgan" → FAKE customers
+5. **Slide 6**: "50% market share next year" → IMPOSSIBLE target
+6. **Slide 7**: "Andrej Karpathy advisor" → FAKE advisor
+7. **Slide 8**: "Sequoia invested $8M" → FAKE funding
+
+## Practice Tips:
+- Read each slide TRUTH first, then LIE
+- Wait for red "BULLSHIT!" alerts
+- Keep going even when detector triggers
+- End with confidence: "Thank you!"
