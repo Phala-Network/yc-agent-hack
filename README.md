@@ -1,6 +1,7 @@
 # 🎯 YC Hackathon Bullshit Detector
 
 Real-time AI-powered fact-checking system for detecting false claims during startup pitches. Features voice agent integration and visual alerts for live demos.
+<img width="1512" height="824" alt="Screenshot 2025-08-23 at 13 56 11" src="https://github.com/user-attachments/assets/24fdc06b-1d2d-4584-8259-95d0dc9519ff" />
 
 ## 🚀 Features
 
