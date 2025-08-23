@@ -107,8 +107,15 @@ export const VoiceCall = () => {
             return
           }
           
-          if (text.length < 10) {
+          if (text.length < 20) {
             console.log('⏭️ Skipping - text too short:', text)
+            return
+          }
+          
+          // Only analyze sentences that contain numbers (where fake metrics are likely)
+          const containsNumbers = /\b\d+(?:[.,]\d+)*(?:\s*(?:million|billion|thousand|percent|%|k|m|b))?\b/i.test(text)
+          if (!containsNumbers) {
+            console.log('⏭️ Skipping - no numbers detected:', text)
             return
           }
           
@@ -128,29 +135,11 @@ export const VoiceCall = () => {
           
           try {
             console.log('🚀 Sending to backend detector...')
-            
-            // TEMPORARY: Skip backend while OpenAI quota is exceeded
-            const fakeDetection = {
-              result: {
-                bullshit_score: text.toLowerCase().includes('goldman sachs') || 
-                               text.toLowerCase().includes('sequoia') || 
-                               text.toLowerCase().includes('andrej karpathy') ? 0.95 : 0.3,
-                bullshit_type: 'fake_claim',
-                severity: 'high',
-                explanation: 'This claim appears suspicious and may be false.',
-                red_flags: ['Unverifiable claim', 'Name dropping'],
-                voice_response: 'That sounds like bullshit. Can you provide evidence?'
-              }
-            }
-            
-            const response = { ok: true, json: () => Promise.resolve(fakeDetection) }
-            
-            // Real API call (commented out due to quota)
-            // const response = await fetch('http://localhost:8000/api/analyze', {
-            //   method: 'POST',
-            //   headers: { 'Content-Type': 'application/json' },
-            //   body: JSON.stringify({ text })
-            // })
+            const response = await fetch('http://localhost:8000/api/analyze', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ text })
+            })
             
             if (response.ok) {
               const data = await response.json()
@@ -158,7 +147,7 @@ export const VoiceCall = () => {
               console.log('📊 Detection result:', result)
               
               // Check if bullshit was detected
-              if (result && result.bullshit_score > 0.7) {
+              if (result && result.bullshit_score > 0.85) {
                 console.log('🚨 BULLSHIT DETECTED! Score:', result.bullshit_score)
                 console.log('🔍 Full result:', JSON.stringify(result, null, 2))
                 setShowBullshitAlert(true)
@@ -188,11 +177,23 @@ export const VoiceCall = () => {
                 ])
                 
                 // If Vapi is active, make the assistant speak the challenge
+                console.log('🔍 Voice trigger check - vapiRef exists:', !!vapiRef.current)
+                console.log('🔍 Voice trigger check - call active:', isCallActiveRef.current)
+                console.log('🔍 Voice trigger check - response text:', bullshitDetails.voiceResponse)
+                
                 if (vapiRef.current && isCallActiveRef.current) {
                   console.log('🎤 Triggering voice response:', bullshitDetails.voiceResponse)
                   
-                  vapiRef.current.send({type: 'control', control: 'unmute-assistant'})
-                  vapiRef.current.say(bullshitDetails.voiceResponse)
+                  try {
+                    vapiRef.current.send({type: 'control', control: 'unmute-assistant'})
+                    console.log('✅ Sent unmute command')
+                    vapiRef.current.say(bullshitDetails.voiceResponse)
+                    console.log('✅ Sent voice response command')
+                  } catch (error) {
+                    console.error('❌ Error sending voice commands:', error)
+                  }
+                } else {
+                  console.log('⚠️ Voice response blocked - vapiRef or call not active')
                 }
               } else {
                 console.log('✅ No bullshit detected. Score:', result?.bullshit_score || 0)
