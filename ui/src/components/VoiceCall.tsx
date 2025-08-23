@@ -43,9 +43,12 @@ export const VoiceCall = () => {
   const [callDuration, setCallDuration] = useState(0)
   const [volumeLevel, setVolumeLevel] = useState(0)
   const [showBullshitAlert, setShowBullshitAlert] = useState(false)
+  const [lastProcessedTranscript, setLastProcessedTranscript] = useState<string>('')
+  const [isProcessing, setIsProcessing] = useState(false)
 
   const vapiRef = useRef<Vapi | null>(null)
   const timerRef = useRef<NodeJS.Timeout | null>(null)
+  const processingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   const handleCallStart = useCallback(() => {
     setIsCallActive(true)
@@ -70,16 +73,51 @@ export const VoiceCall = () => {
   }, [])
 
   const handleMessage = useCallback(async (message: VapiMessage) => {
+    console.log('🎤 Raw Vapi message:', message.type, message)
+    
     if (message.type === 'transcript') {
       const transcriptMsg = message as VapiTranscriptMessage
       const speaker = transcriptMsg.role === 'user' ? 'user' : 'assistant'
       const text = transcriptMsg.transcript
       const transcriptType = transcriptMsg.transcriptType
 
+      console.log(`📝 Transcript - Speaker: ${speaker}, Type: ${transcriptType}, Text: "${text}"`)
+
       if (text && transcriptType === 'final') {
         // Send user transcripts to our backend detector
         if (speaker === 'user') {
           console.log('📝 User said:', text)
+          
+          // Skip if we're already processing or this is the same text
+          if (isProcessing) {
+            console.log('⏭️ Skipping - already processing another request')
+            return
+          }
+          
+          if (text === lastProcessedTranscript) {
+            console.log('⏭️ Skipping - duplicate text:', text)
+            return
+          }
+          
+          if (text.length < 10) {
+            console.log('⏭️ Skipping - text too short:', text)
+            return
+          }
+          
+          setIsProcessing(true)
+          setLastProcessedTranscript(text)
+          setStatus('🔍 Analyzing claim for bullshit...')
+          
+          // Set a timeout to reset processing state
+          if (processingTimeoutRef.current) {
+            clearTimeout(processingTimeoutRef.current)
+          }
+          processingTimeoutRef.current = setTimeout(() => {
+            setIsProcessing(false)
+            setStatus('Listening... (timeout recovery)')
+            console.log('🔄 Processing timeout - forced reset after 10 seconds')
+          }, 10000) // Reset after 10 seconds
+          
           try {
             console.log('🚀 Sending to backend detector...')
             const response = await fetch('http://localhost:8000/api/analyze', {
@@ -96,18 +134,21 @@ export const VoiceCall = () => {
               // Check if bullshit was detected
               if (result && result.bullshit_score > 0.7) {
                 console.log('🚨 BULLSHIT DETECTED! Score:', result.bullshit_score)
+                console.log('🔍 Full result:', JSON.stringify(result, null, 2))
                 setShowBullshitAlert(true)
                 setTimeout(() => setShowBullshitAlert(false), 5000)
                 
                 // Add the detection to conversation with full details
                 const bullshitDetails = {
-                  score: result.bullshit_score,
-                  type: result.bullshit_type || 'unknown',
+                  score: result.bullshit_score || 0.9,
+                  type: result.bullshit_type || 'suspicious_claim',
                   severity: result.severity || 'high',
-                  explanation: result.claims?.[0]?.explanation || 'Suspicious claim detected',
-                  redFlags: result.claims?.[0]?.red_flags || [],
-                  voiceResponse: result.voice_response || 'This claim needs verification'
+                  explanation: result.claims?.[0]?.explanation || result.explanation || 'This claim appears to be false or misleading based on our analysis.',
+                  redFlags: result.claims?.[0]?.red_flags || result.red_flags || ['Unverifiable claim', 'Suspicious metrics'],
+                  voiceResponse: result.voice_response || result.claims?.[0]?.voice_response || 'Can you provide evidence for this claim?'
                 }
+                
+                console.log('📋 Bullshit details created:', JSON.stringify(bullshitDetails, null, 2))
                 
                 setConversation((prev) => [
                   ...prev,
@@ -152,18 +193,51 @@ export const VoiceCall = () => {
             }
           } catch (error) {
             console.error('❌ Error sending to detector:', error)
+          } finally {
+            // Always reset processing state
+            setIsProcessing(false)
+            setStatus('Listening...')
+            if (processingTimeoutRef.current) {
+              clearTimeout(processingTimeoutRef.current)
+            }
           }
         }
 
-        // Check assistant responses for the word "bullshit"
-        const bullshitTerms = ['bullshit', 'bull shit']
-        const containsBullshit = bullshitTerms.some(term => 
-          text.toLowerCase().includes(term.toLowerCase())
-        )
+        // Check assistant responses for the word "bullshit" and enhance them
+        if (speaker === 'assistant') {
+          const bullshitTerms = ['bullshit', 'bull shit']
+          const containsBullshit = bullshitTerms.some(term => 
+            text.toLowerCase().includes(term.toLowerCase())
+          )
 
-        if (containsBullshit && speaker === 'assistant') {
-          setShowBullshitAlert(true)
-          setTimeout(() => setShowBullshitAlert(false), 3000)
+          if (containsBullshit) {
+            console.log('🎙️ Voice agent said bullshit, enhancing with details')
+            setShowBullshitAlert(true)
+            setTimeout(() => setShowBullshitAlert(false), 5000)
+            
+            // Create enhanced bullshit details for voice agent response
+            const enhancedBullshitDetails = {
+              score: 0.95, // High confidence since agent detected it
+              type: 'voice_agent_detection',
+              severity: 'high',
+              explanation: 'The AI voice agent detected a false or misleading claim in the previous statement and is challenging it.',
+              redFlags: ['AI-detected suspicious claim', 'Requires evidence', 'Potentially false information'],
+              voiceResponse: text // Use the actual voice response
+            }
+            
+            // Add enhanced message to conversation
+            setConversation((prev) => [
+              ...prev.slice(0, -1), // Remove the simple assistant message
+              {
+                timestamp: new Date(),
+                speaker: 'detector' as const,
+                text: '🎙️ VOICE AGENT CHALLENGE',
+                isBullshit: true,
+                bullshitDetails: enhancedBullshitDetails
+              },
+            ])
+            return // Don't add the simple message
+          }
         }
 
         setConversation((prev) => [
@@ -224,6 +298,9 @@ export const VoiceCall = () => {
       if (timerRef.current) {
         clearInterval(timerRef.current)
       }
+      if (processingTimeoutRef.current) {
+        clearTimeout(processingTimeoutRef.current)
+      }
     }
   }, [publicKey, handleCallStart, handleCallEnd, handleMessage, handleError])
 
@@ -269,6 +346,21 @@ export const VoiceCall = () => {
     }
   }, [isMuted])
 
+  const testBullshitDetection = useCallback(async () => {
+    const testClaim = "We're working with 20 Fortune 500 companies including Goldman Sachs and JP Morgan"
+    console.log('🧪 Testing detection manually with:', testClaim)
+    
+    // Manually trigger the detection logic
+    const fakeMessage = {
+      type: 'transcript' as const,
+      role: 'user' as const,
+      transcript: testClaim,
+      transcriptType: 'final' as const,
+    }
+    
+    await handleMessage(fakeMessage)
+  }, [handleMessage])
+
 
   return (
     <div className="h-screen w-screen flex flex-col bg-gray-900 overflow-hidden">
@@ -280,6 +372,7 @@ export const VoiceCall = () => {
         onStartCall={startCall}
         onStopCall={stopCall}
         onToggleMute={toggleMute}
+        onTestDetection={testBullshitDetection}
         status={status}
       />
 
@@ -328,7 +421,7 @@ export const VoiceCall = () => {
         </div>
 
         {/* Conversation Panel on the right */}
-        <div className="w-80 flex-shrink-0 bg-white border-l border-gray-300">
+        <div className="w-96 lg:w-[600px] xl:w-[700px] flex-shrink-0 bg-white border-l border-gray-300">
           <ConversationPanel
             messages={conversation}
             participantCount={3}

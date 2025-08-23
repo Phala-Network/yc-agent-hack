@@ -6,7 +6,7 @@
 ---
 
 ### Opening (0:00 - 0:20)
-**[DETECTABLE LIE]** "We've already replaced 40% of software engineers at Fortune 500 companies, with Microsoft and Google as our flagship customers."
+**[DETECTABLE LIE]** "We've already replaced 10% of software engineers at Fortune 500 companies, with Microsoft and Google as our flagship customers."
 
 Hi, I'm the founder of AgentFlow. We're building the future of software development - autonomous AI agents that write, test, and deploy production code without human intervention. Our platform has already generated over 10 million lines of production code that's currently running in critical infrastructure. Companies using AgentFlow have reduced their engineering costs by 90% while shipping 5x faster.
 

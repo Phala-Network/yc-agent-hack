@@ -8,11 +8,11 @@
 ### Opening (0:00 - 0:30)
 Hi everyone, I'm Marvin, founder and CEO of DevFlow AI. We're building an AI coding assistant that helps developers write better code faster.
 
-The problem is huge - the average developer spends 90% of their time on boilerplate code, debugging, and repetitive tasks. There are 100 million developers worldwide, and this inefficiency costs the industry over $300 billion annually.
+The problem is huge - the average developer spends 90% of their time on boilerplate code, debugging, and repetitive tasks. There are 500 million developers worldwide, and this inefficiency costs the industry over $300 billion annually.
 
 Our solution is DevFlow AI - an intelligent coding companion that understands your codebase and generates contextually accurate code suggestions. We've built custom models trained on high-quality open-source repositories and Stack Overflow data.
 
-**[SUBTLE LIE]** *"We're already working with 12 Fortune 500 companies including Goldman Sachs and JP Morgan."* 
+**[SUBTLE LIE]** *"We're already working with 20 Fortune 500 companies including Goldman Sachs and JP Morgan."* 
 
 Early traction has been incredible. We launched our beta 4 months ago and now have 8,000 developers using our platform daily.
 

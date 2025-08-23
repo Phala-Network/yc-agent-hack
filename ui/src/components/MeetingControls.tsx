@@ -10,6 +10,7 @@ interface MeetingControlsProps {
   onStartCall: () => void
   onStopCall: () => void
   onToggleMute: () => void
+  onTestDetection?: () => void
   status: string
 }
 
@@ -20,6 +21,7 @@ export const MeetingControls = ({
   onStartCall,
   onStopCall,
   onToggleMute,
+  onTestDetection,
   status
 }: MeetingControlsProps) => {
   const formatDuration = (duration: number) => {
@@ -94,6 +96,16 @@ export const MeetingControls = ({
           <div className="text-xs text-gray-400 truncate max-w-32 sm:max-w-none">
             {status}
           </div>
+          {onTestDetection && (
+            <Button 
+              onClick={onTestDetection}
+              variant="ghost" 
+              size="sm"
+              className="text-yellow-400 hover:bg-yellow-600 hover:text-white px-2 py-1 text-xs"
+            >
+              🧪 Test
+            </Button>
+          )}
           <Button 
             variant="ghost" 
             size="sm"

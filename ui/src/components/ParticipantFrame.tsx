@@ -86,10 +86,15 @@ export const ParticipantFrame = ({
 
       {/* Bullshit Alert Overlay */}
       {alertVisible && role === 'detector' && (
-        <div className="absolute inset-0 bg-red-600/95 flex items-center justify-center animate-pulse z-10">
-          <div className="text-center text-white">
-            <div className="text-2xl md:text-4xl font-bold mb-2 drop-shadow-lg">BULLSHIT!</div>
-            <AlertTriangle className="h-6 w-6 md:h-8 md:w-8 mx-auto animate-bounce" />
+        <div className="absolute inset-0 bg-red-700/98 flex items-center justify-center animate-pulse z-20 border-4 border-red-400">
+          <div className="text-center text-white transform scale-110">
+            <div className="text-6xl md:text-8xl font-black mb-4 drop-shadow-2xl animate-bounce text-yellow-300 stroke-red-900" style={{textShadow: '4px 4px 8px rgba(0,0,0,0.8)'}}>
+              🚨 BULLSHIT! 🚨
+            </div>
+            <div className="text-2xl md:text-4xl font-bold text-white mb-3 drop-shadow-xl">
+              FALSE CLAIM DETECTED
+            </div>
+            <AlertTriangle className="h-16 w-16 md:h-20 md:w-20 mx-auto animate-bounce text-yellow-400 drop-shadow-xl" />
           </div>
         </div>
       )}

@@ -69,7 +69,7 @@ export const ConversationPanel = ({ messages, participantCount }: ConversationPa
       {/* Messages */}
       <div className="flex-1 overflow-hidden">
         <ScrollArea className="h-full">
-          <div className="p-3">
+          <div className="p-6">
             {messages.length === 0 ? (
               <div className="text-center text-gray-400 py-12">
                 <MessageCircle className="h-8 w-8 mx-auto mb-3 opacity-40" />
@@ -78,9 +78,9 @@ export const ConversationPanel = ({ messages, participantCount }: ConversationPa
                 </p>
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {messages.map((message, index) => (
-                  <div key={`${message.timestamp.getTime()}-${index}`} className="space-y-2">
+                  <div key={`${message.timestamp.getTime()}-${index}`} className="space-y-3">
                     <div className="flex items-center gap-2">
                       <Badge 
                         variant="outline" 
@@ -92,51 +92,71 @@ export const ConversationPanel = ({ messages, participantCount }: ConversationPa
                         {formatTime(message.timestamp)}
                       </span>
                     </div>
-                    <div className={`rounded-lg p-3 text-xs leading-relaxed border ${getMessageBg(message.speaker)}`}>
+                    <div className={`rounded-lg text-xs leading-relaxed border ${getMessageBg(message.speaker)} ${message.isBullshit ? 'p-0' : 'p-3'}`}>
                       {message.isBullshit && message.bullshitDetails ? (
-                        <div className="space-y-3">
-                          <div className="flex items-center gap-2 text-red-700 font-bold text-sm">
-                            <AlertTriangle className="h-4 w-4" />
-                            {message.text}
+                        <div className="space-y-4 p-6 bg-red-100 border-4 border-red-500 rounded-xl">
+                          <div className="flex items-center gap-3 text-red-800 font-black text-3xl animate-pulse">
+                            <AlertTriangle className="h-8 w-8 animate-bounce" />
+                            <span className="drop-shadow-lg">{message.text || "BULLSHIT DETECTED!"}</span>
                           </div>
                           
-                          <div className="space-y-2 text-gray-700">
-                            <div className="flex items-start gap-2">
-                              <Badge className="bg-red-500 text-white">
-                                Score: {Math.round(message.bullshitDetails.score * 100)}%
+                          <div className="space-y-4 text-lg">
+                            <div className="flex items-start gap-3 flex-wrap">
+                              <Badge className="bg-red-600 text-white text-xl px-4 py-2 font-bold">
+                                🎯 Score: {Math.round((message.bullshitDetails?.score || 0.9) * 100)}%
                               </Badge>
-                              <Badge variant="outline" className="border-red-500 text-red-700">
-                                {message.bullshitDetails.type.replace(/_/g, ' ')}
+                              <Badge variant="outline" className="border-red-600 text-red-800 text-lg px-4 py-2 font-bold">
+                                {message.bullshitDetails?.type === 'voice_agent_detection' ? '🎙️' : '📝'} {(message.bullshitDetails?.type || 'suspicious_claim').replace(/_/g, ' ').toUpperCase()}
                               </Badge>
-                              <Badge variant="outline" className={`
-                                ${message.bullshitDetails.severity === 'extreme' ? 'border-red-600 text-red-600' : ''}
-                                ${message.bullshitDetails.severity === 'high' ? 'border-orange-600 text-orange-600' : ''}
-                                ${message.bullshitDetails.severity === 'medium' ? 'border-yellow-600 text-yellow-600' : ''}
-                                ${message.bullshitDetails.severity === 'low' ? 'border-gray-600 text-gray-600' : ''}
+                              <Badge variant="outline" className={`text-lg px-4 py-2 font-bold
+                                ${(message.bullshitDetails?.severity || 'high') === 'extreme' ? 'border-red-700 text-red-700 bg-red-50' : ''}
+                                ${(message.bullshitDetails?.severity || 'high') === 'high' ? 'border-orange-600 text-orange-700 bg-orange-50' : ''}
+                                ${(message.bullshitDetails?.severity || 'high') === 'medium' ? 'border-yellow-600 text-yellow-700 bg-yellow-50' : ''}
+                                ${(message.bullshitDetails?.severity || 'high') === 'low' ? 'border-gray-600 text-gray-700 bg-gray-50' : ''}
                               `}>
-                                {message.bullshitDetails.severity}
+                                ⚠️ {(message.bullshitDetails?.severity || 'HIGH').toUpperCase()}
                               </Badge>
                             </div>
                             
-                            <div className="bg-white/50 rounded p-2">
-                              <p className="font-semibold mb-1">Analysis:</p>
-                              <p>{message.bullshitDetails.explanation}</p>
+                            <div className="bg-white rounded-lg p-4 border-2 border-gray-200 shadow-sm">
+                              <p className="font-bold text-xl mb-3 text-gray-800">🔍 ANALYSIS:</p>
+                              <p className="text-lg leading-relaxed text-gray-700">
+                                {message.bullshitDetails?.explanation || 'This claim appears to be false or misleading based on our analysis.'}
+                              </p>
                             </div>
                             
-                            {message.bullshitDetails.redFlags.length > 0 && (
-                              <div className="bg-white/50 rounded p-2">
-                                <p className="font-semibold mb-1">Red Flags:</p>
-                                <ul className="list-disc list-inside space-y-1">
-                                  {message.bullshitDetails.redFlags.map((flag, i) => (
-                                    <li key={i}>{flag}</li>
+                            {(message.bullshitDetails?.redFlags?.length > 0 || !message.bullshitDetails?.redFlags) && (
+                              <div className="bg-white rounded-lg p-4 border-2 border-red-300 shadow-sm">
+                                <p className="font-bold text-xl mb-3 text-red-800">🚩 RED FLAGS:</p>
+                                <ul className="space-y-2 text-lg">
+                                  {(message.bullshitDetails?.redFlags || ['Unverifiable claim', 'Suspicious metrics']).map((flag, i) => (
+                                    <li key={i} className="flex items-start gap-2">
+                                      <span className="text-red-600 font-bold">•</span>
+                                      <span className="text-red-700 font-medium">{flag}</span>
+                                    </li>
                                   ))}
                                 </ul>
                               </div>
                             )}
                             
-                            <div className="bg-yellow-50 border border-yellow-200 rounded p-2">
-                              <p className="font-semibold mb-1 text-yellow-800">VC Response:</p>
-                              <p className="text-yellow-900 italic">"{message.bullshitDetails.voiceResponse}"</p>
+                            <div className="bg-yellow-100 border-4 border-yellow-400 rounded-lg p-6 shadow-lg">
+                              <p className="font-black text-2xl mb-4 text-yellow-900">
+                                {message.bullshitDetails?.type === 'voice_agent_detection' ? '🎙️ LIVE VOICE CHALLENGE:' : '💬 VC CHALLENGE:'}
+                              </p>
+                              <div className={`rounded-lg p-4 border-2 ${
+                                message.bullshitDetails?.type === 'voice_agent_detection' 
+                                  ? 'bg-blue-50 border-blue-300' 
+                                  : 'bg-yellow-50 border-yellow-300'
+                              }`}>
+                                <p className="text-xl font-bold italic leading-relaxed">
+                                  "{message.bullshitDetails?.voiceResponse || 'Can you provide evidence for this claim?'}"
+                                </p>
+                              </div>
+                              {message.bullshitDetails?.type === 'voice_agent_detection' && (
+                                <p className="text-sm text-blue-700 mt-2 font-medium">
+                                  ↑ This challenge was spoken live by the AI voice agent
+                                </p>
+                              )}
                             </div>
                           </div>
                         </div>
