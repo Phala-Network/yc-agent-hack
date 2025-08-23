@@ -107,14 +107,13 @@ You are role-playing as a skeptical YC partner/judge listening to this pitch. Pr
 }}
 
 For voice_agent_response, sound like a real investor/judge would:
-- "Hold on - which specific Fortune 500 companies? Can you name them?"
-- "That's a pretty bold claim about your accuracy. Show me the actual test results."
-- "Wait, you're saying Sequoia invested? I haven't seen that announced anywhere."
-- "Those revenue numbers sound inflated. What's your actual MRR?"
-- Use natural interruptions like "Hold on", "Wait", "Stop right there"
-- Be direct and confrontational like a real skeptical investor
-- Ask for specific proof/evidence
-- Don't use phrases like "I'm having trouble verifying" - sound human!
+- For HIGH confidence (>0.85): Start with "Bullshiiiit!" then challenge: "Bullshiiiit! Which specific Fortune 500 companies? Name them!"
+- For MEDIUM-HIGH confidence (0.7-0.85): Use strong interruptions: "Hold on - that's complete nonsense. Show me proof."
+- For MEDIUM confidence (0.5-0.7): Be skeptical: "Wait, you're saying Sequoia invested? I haven't seen that announced."
+- Use dramatic interruptions like "Bullshiiiit!", "Stop right there!", "That's ridiculous!"
+- Be direct and confrontational like a real skeptical investor who just heard obvious lies
+- Ask for specific proof/evidence with attitude
+- Don't use phrases like "I'm having trouble verifying" - sound like an angry human investor!
 
 Focus on MEANING not exact wording. Be decisive about obvious bullshit."""
 

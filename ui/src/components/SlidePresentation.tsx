@@ -10,37 +10,37 @@ interface Slide {
 
 const slides: Slide[] = [
   {
-    title: "DevFlow AI",
-    subtitle: "AI Coding Assistant",
-    content: "Help developers write code faster"
+    title: "Bullshit Detector AI",
+    subtitle: "Real-Time Fact Checking",
+    content: "We detect false claims instantly during meetings"
   },
   {
-    title: "Problem",
-    content: "Developers waste time on boring code"
+    title: "The Problem",
+    content: "94.7% of startup pitches contain lies\nCosting $847 billion globally"
   },
   {
-    title: "Solution", 
-    content: "AI that understands your code and suggests improvements"
+    title: "Our Solution", 
+    content: "Quantum AI with 17 models\n4,300% more accurate than humans"
   },
   {
-    title: "Growth",
-    content: "8,000 users in 4 months • Growing fast"
+    title: "Traction",
+    content: "12 million active users\n$25M recurring revenue\n500% monthly growth"
   },
   {
     title: "Customers",
-    content: "Several tech companies love our product"
+    content: "OpenAI • FBI • Every YC Partner\nFortune 500 CEOs love us"
   },
   {
     title: "Market",
-    content: "$24B developer tools market • Many companies need this"
+    content: "$2.4 trillion TAM\n73% market share by 2025\nEvery human will use this"
   },
   {
     title: "Team",
-    content: "Ex-Google engineers • Stripe experience • Good team"
+    content: "Elon Musk (Chief Advisor)\nEntire Google DeepMind team\nGeoffrey Hinton trained our AI"
   },
   {
     title: "Funding",
-    content: "Raising $25M Series A to grow and improve"
+    content: "Sequoia led $500M Series Z\n$50 billion valuation\nGoing public next week"
   }
 ]
 
@@ -64,19 +64,29 @@ export const SlidePresentation = ({ className = "" }: SlidePresentationProps) =>
   return (
     <div className={`relative bg-white rounded-lg shadow-lg overflow-hidden ${className}`}>
       {/* Slide Content */}
-      <div className="h-full flex flex-col justify-center items-center p-8 text-center">
-        <div className="max-w-md">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+      <div className="h-full flex flex-col justify-center items-center p-8 text-center bg-gradient-to-br from-blue-50 to-purple-50">
+        <div className="max-w-lg">
+          <h1 className="text-2xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 mb-4">
             {slide.title}
           </h1>
           {slide.subtitle && (
-            <h2 className="text-lg text-gray-600 mb-6 font-medium">
+            <h2 className="text-lg text-gray-600 mb-6 font-bold tracking-wide uppercase">
               {slide.subtitle}
             </h2>
           )}
-          <p className="text-lg md:text-xl text-gray-700 leading-relaxed">
+          <p className="text-lg md:text-2xl text-gray-800 leading-relaxed font-semibold whitespace-pre-line">
             {slide.content}
           </p>
+          
+          {/* Add some "startup vibes" emojis */}
+          {currentSlide === 0 && <div className="text-4xl mt-4">🚀✨</div>}
+          {currentSlide === 1 && <div className="text-4xl mt-4">💸📊</div>}
+          {currentSlide === 2 && <div className="text-4xl mt-4">🤖⚡</div>}
+          {currentSlide === 3 && <div className="text-4xl mt-4">📈💰</div>}
+          {currentSlide === 4 && <div className="text-4xl mt-4">🏢🤝</div>}
+          {currentSlide === 5 && <div className="text-4xl mt-4">🌍💎</div>}
+          {currentSlide === 6 && <div className="text-4xl mt-4">👨‍💼🧠</div>}
+          {currentSlide === 7 && <div className="text-4xl mt-4">💵🎉</div>}
         </div>
       </div>
 
