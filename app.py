@@ -31,8 +31,8 @@ console = Console()
 class Config:
     OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
     VAPI_API_KEY = os.getenv('VAPI_API_KEY')
-    OPENAI_MODEL = "gpt-4o-search-preview"  # Web search enabled
-    FLASK_PORT = 5000
+    OPENAI_MODEL = "gpt-4o"  # Advanced reasoning model
+    FLASK_PORT = 8000
     WEBHOOK_ENDPOINT = '/transcript'
     LOG_FILE = 'bullshit_detections.log'
     CITATIONS_FILE = 'fact_check_citations.json'
@@ -61,27 +61,34 @@ STARTUP ECOSYSTEM KNOWLEDGE:
 - Typical YC company metrics vs impossible claims  
 - Common startup lies (fake customers, inflated revenue, impossible scale)
 - Realistic funding patterns and suspicious investment claims
-- Technology limitations and achievable performance benchmarks
+- Current AI/tech capabilities vs impossible claims
 - Market sizing reality (no single market is $20T, global GDP is ~$100T)
 - How partnerships with big tech companies actually work
 - Realistic team credentials vs obvious fabrications
 
-DETECTION EXPERTISE:
-- Revenue claims: $50M ARR in 6 months for unknown startup = suspicious
-- Customer claims: "Fortune 500 companies" without names = red flag  
-- Partnership claims: "Working with Google/Microsoft" usually false
-- Performance claims: >99% accuracy on benchmarks = likely impossible
-- Market claims: Multi-trillion dollar markets = grossly inflated
-- Team claims: "Ex-Google founders" = verify carefully
-- Funding claims: Massive rounds from top VCs = often fabricated
+WHAT TO FLAG AS BULLSHIT:
+- Revenue claims: $50M ARR in 6 months for unknown startup
+- Customer claims: "Fortune 500 companies" without specific names
+- Partnership claims: "Working with Google/Microsoft" (usually fake)
+- Performance claims: >99% accuracy on technical benchmarks
+- Market claims: Multi-trillion dollar markets 
+- Team claims: "Ex-OpenAI founders", "Hinton is our advisor"
+- Funding claims: "$50M from Sequoia" (usually fabricated)
 
-Your job is to detect bullshit with high accuracy while being fair to legitimate claims."""
+WHAT NOT TO FLAG (these are realistic):
+- Normal AI capabilities: code suggestions, refactoring assistance, test generation
+- Standard SaaS metrics: reasonable growth rates, retention numbers
+- Legitimate team backgrounds: "engineers from Google/Meta"
+- Realistic funding: seed/Series A rounds with reasonable amounts
+- Achievable performance: incremental improvements over existing tools
+
+Be CONSERVATIVE - only flag obvious lies and impossible claims, not legitimate capabilities."""
 
             user_prompt = f"""Analyze this startup pitch claim for potential bullshit:
 
 "{text}"
 
-Use web search to verify facts where possible. Provide analysis in this EXACT JSON format:
+You are role-playing as a skeptical YC partner/judge listening to this pitch. Provide analysis in this EXACT JSON format:
 
 {{
     "is_bullshit": true/false,
@@ -92,22 +99,31 @@ Use web search to verify facts where possible. Provide analysis in this EXACT JS
     "explanation": "Detailed analysis of why this is/isn't bullshit",
     "red_flags": ["specific", "red", "flags", "identified"],
     "reality_check": "What would be realistic instead",
-    "voice_agent_response": "What voice agent should say (empty if not bullshit)",
+    "voice_agent_response": "What a skeptical judge/investor would say when interrupting (natural, confrontational human speech - NOT AI assistant language)",
     "should_interrupt": true/false,
     "sources_checked": ["URLs or sources if web search used"]
 }}
 
-Be decisive - if it sounds like typical startup bullshit, call it out strongly. Focus on MEANING not exact wording."""
+For voice_agent_response, sound like a real investor/judge would:
+- "Hold on - which specific Fortune 500 companies? Can you name them?"
+- "That's a pretty bold claim about your accuracy. Show me the actual test results."
+- "Wait, you're saying Sequoia invested? I haven't seen that announced anywhere."
+- "Those revenue numbers sound inflated. What's your actual MRR?"
+- Use natural interruptions like "Hold on", "Wait", "Stop right there"
+- Be direct and confrontational like a real skeptical investor
+- Ask for specific proof/evidence
+- Don't use phrases like "I'm having trouble verifying" - sound human!
 
-            # Use web search model for comprehensive analysis
+Focus on MEANING not exact wording. Be decisive about obvious bullshit."""
+
+            # Use GPT-4o for comprehensive analysis (web search via model capability)
             response = await asyncio.to_thread(
                 openai_client.chat.completions.create,
-                model=Config.OPENAI_MODEL,
+                model="gpt-4o",  # Use standard GPT-4o model
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt}
                 ],
-                web_search_options={"search_context_size": "medium"},
                 temperature=0.1,
                 max_tokens=1000
             )
@@ -182,14 +198,14 @@ Be decisive - if it sounds like typical startup bullshit, call it out strongly. 
         
         text_lower = text.lower()
         high_bs_indicators = [
-            ('trillion', 'impossible_market_size', 'No single market is worth trillions'),
-            ('fortune 500', 'fake_customers', 'Fortune 500 claims need verification'),
-            ('partnership with google', 'fake_partnerships', 'Google partnerships are rarely real'),
-            ('partnership with microsoft', 'fake_partnerships', 'Microsoft partnerships need proof'),
-            ('99.', 'impossible_performance', 'Performance claims exceed realistic limits'),
-            ('$', 'suspicious_funding', 'Financial claims need verification'),
-            ('yc invested', 'premature_investment', 'Investment claims are premature'),
-            ('series a', 'funding_claims', 'Funding rounds need verification')
+            ('trillion', 'impossible_market_size', 'Hold on - did you just say trillion? What market is worth trillions?'),
+            ('fortune 500', 'fake_customers', 'Stop right there - which Fortune 500 companies exactly? Can you name them?'),
+            ('partnership with google', 'fake_partnerships', 'Wait, you have a partnership with Google? Show me the press release.'),
+            ('partnership with microsoft', 'fake_partnerships', 'Microsoft partnership? That would be big news. Where\'s the announcement?'),
+            ('99.', 'impossible_performance', 'Hold up - 99% accuracy? That sounds too good to be true. Show me the data.'),
+            ('sequoia', 'suspicious_funding', 'Sequoia invested? I haven\'t seen that anywhere. Can you prove it?'),
+            ('yc invested', 'premature_investment', 'Wait, YC invested in you? This is news to me.'),
+            ('goldman sachs', 'fake_customers', 'Goldman Sachs is your customer? That\'s a pretty big claim.')
         ]
         
         for indicator, bs_type, explanation in high_bs_indicators:
@@ -203,7 +219,7 @@ Be decisive - if it sounds like typical startup bullshit, call it out strongly. 
                         'confidence': 0.85,
                         'explanation': f'{explanation}. This type of claim is commonly fabricated in startup pitches.'
                     }],
-                    'voice_response': f'BULLSHIT! {explanation}. Can you provide concrete evidence?',
+                    'voice_response': explanation,
                     'bullshit_type': bs_type,
                     'analysis_method': 'emergency_pattern_matching'
                 }
@@ -350,7 +366,7 @@ if __name__ == "__main__":
     console.print(Panel.fit(
         f"""[bold cyan]🎯 YC HACKATHON BULLSHIT DETECTOR 🎯[/bold cyan]
         
-Advanced AI-powered fact checking with web search
+Advanced AI-powered fact checking with smart analysis
 Model: {Config.OPENAI_MODEL}
 Web Interface: http://localhost:{Config.FLASK_PORT}
 Webhook: http://localhost:{Config.FLASK_PORT}{Config.WEBHOOK_ENDPOINT}

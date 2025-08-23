@@ -36,7 +36,7 @@ We support 15 programming languages and integrate seamlessly with VS Code, Intel
 ### Traction & Business Model (1:00 - 1:30)
 We use a freemium SaaS model - free for individual developers, $20/month for pro features, and custom enterprise pricing starting at $50/seat/month.
 
-Our growth metrics are strong: 15% week-over-week user growth, 85% monthly retention, and $180K in ARR after just 4 months. Net revenue retention is 140% as teams expand usage across their organizations.
+Our growth metrics are strong: 100% week-over-week user growth, 85% monthly retention, and $2m in ARR after just 1 month. Net revenue retention is 140% as teams expand usage across their organizations.
 
 **[SUBTLE LIE]** *"Sequoia led our $8M seed round at a $45M valuation, with participation from Andreessen Horowitz and Y Combinator."*
 
