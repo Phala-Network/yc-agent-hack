@@ -13,13 +13,22 @@ import { MeetingControls } from './MeetingControls'
 
 const VAPI_CONFIG = {
   PUBLIC_KEY: '8bf3ee7e-bfdc-42b0-893b-a75e93ed9c40',
-  ASSISTANT_ID: '82e12d73-dc92-4424-9249-1d77940155f5'
+  ASSISTANT_ID: 'f80bdb7d-68d6-48cd-8676-f803bab629c7'
 } as const
 
 interface ConversationMessage {
   timestamp: Date
-  speaker: 'user' | 'assistant'
+  speaker: 'user' | 'assistant' | 'detector'
   text: string
+  isBullshit?: boolean
+  bullshitDetails?: {
+    score: number
+    type: string
+    severity: string
+    explanation: string
+    redFlags: string[]
+    voiceResponse: string
+  }
 }
 
 
@@ -60,7 +69,7 @@ export const VoiceCall = () => {
     }
   }, [])
 
-  const handleMessage = useCallback((message: VapiMessage) => {
+  const handleMessage = useCallback(async (message: VapiMessage) => {
     if (message.type === 'transcript') {
       const transcriptMsg = message as VapiTranscriptMessage
       const speaker = transcriptMsg.role === 'user' ? 'user' : 'assistant'
@@ -68,6 +77,85 @@ export const VoiceCall = () => {
       const transcriptType = transcriptMsg.transcriptType
 
       if (text && transcriptType === 'final') {
+        // Send user transcripts to our backend detector
+        if (speaker === 'user') {
+          console.log('📝 User said:', text)
+          try {
+            console.log('🚀 Sending to backend detector...')
+            const response = await fetch('http://localhost:8000/api/analyze', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ text })
+            })
+            
+            if (response.ok) {
+              const data = await response.json()
+              const result = data.result
+              console.log('📊 Detection result:', result)
+              
+              // Check if bullshit was detected
+              if (result && result.bullshit_score > 0.7) {
+                console.log('🚨 BULLSHIT DETECTED! Score:', result.bullshit_score)
+                setShowBullshitAlert(true)
+                setTimeout(() => setShowBullshitAlert(false), 5000)
+                
+                // Add the detection to conversation with full details
+                const bullshitDetails = {
+                  score: result.bullshit_score,
+                  type: result.bullshit_type || 'unknown',
+                  severity: result.severity || 'high',
+                  explanation: result.claims?.[0]?.explanation || 'Suspicious claim detected',
+                  redFlags: result.claims?.[0]?.red_flags || [],
+                  voiceResponse: result.voice_response || 'This claim needs verification'
+                }
+                
+                setConversation((prev) => [
+                  ...prev,
+                  {
+                    timestamp: new Date(),
+                    speaker: 'detector' as const,
+                    text: `🚨 BULLSHIT DETECTED!`,
+                    isBullshit: true,
+                    bullshitDetails
+                  },
+                ])
+                
+                // If Vapi is active, make the assistant speak the challenge
+                if (vapiRef.current && isCallActive) {
+                  console.log('🎤 Triggering voice response:', bullshitDetails.voiceResponse)
+                  
+                  // Send the message to Vapi using the send method
+                  try {
+                    // Send a system message to trigger the assistant to speak
+                    vapiRef.current.send({
+                      type: 'add-message',
+                      message: {
+                        role: 'system',
+                        content: `INTERRUPT AND SAY: "${bullshitDetails.voiceResponse}"`
+                      }
+                    })
+                    console.log('📤 Sent interrupt command to Vapi')
+                  } catch (error) {
+                    console.error('Failed to send to Vapi:', error)
+                    
+                    // Alternative: Use Vapi's say method if available
+                    if (typeof vapiRef.current.say === 'function') {
+                      vapiRef.current.say(bullshitDetails.voiceResponse)
+                    }
+                  }
+                }
+              } else {
+                console.log('✅ No bullshit detected. Score:', result?.bullshit_score || 0)
+              }
+            } else {
+              console.error('❌ Backend response not OK:', response.status)
+            }
+          } catch (error) {
+            console.error('❌ Error sending to detector:', error)
+          }
+        }
+
+        // Check assistant responses for the word "bullshit"
         const bullshitTerms = ['bullshit', 'bull shit']
         const containsBullshit = bullshitTerms.some(term => 
           text.toLowerCase().includes(term.toLowerCase())

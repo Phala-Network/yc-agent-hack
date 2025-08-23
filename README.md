@@ -2,7 +2,7 @@
 
 > **AI-powered real-time fact-checking system for startup pitches**
 
-Detect false claims, impossible metrics, and fake partnerships in startup pitches using advanced LLM analysis with web search verification.
+Detect false claims, impossible metrics, and fake partnerships in startup pitches using advanced LLM analysis. Features a modern React UI with detailed bullshit analysis and Vapi voice integration.
 
 ## 🚀 Quick Start
 
@@ -23,15 +23,22 @@ Detect false claims, impossible metrics, and fake partnerships in startup pitche
    VAPI_API_KEY=your-vapi-key-here  # Optional
    ```
 
-3. **Run the Detector**
+3. **Start Backend**
    ```bash
    python app.py
    ```
 
-4. **Open Web Interface**
-   - Visit: http://localhost:5000
-   - Try sample pitch claims
-   - See real-time bullshit detection!
+4. **Start Frontend UI**
+   ```bash
+   cd ui
+   npm install
+   npm run dev
+   ```
+
+5. **Open Applications**
+   - **Backend API**: http://localhost:8000
+   - **Frontend UI**: http://localhost:5173
+   - Try the realistic pitch script with voice or text input!
 
 ## 🎭 Demo Script
 
@@ -44,9 +51,15 @@ Use the included `realistic_pitch_script.md` for your YC hackathon demo:
 
 ### Smart Detection Engine
 - **LLM Analysis**: Uses GPT-4o with comprehensive startup knowledge
-- **Web Search**: Verifies claims against real-time web data  
 - **Pattern Recognition**: Identifies common startup lies
 - **Confidence Scoring**: Provides 0-100% bullshit probability
+- **Voice Integration**: Real-time Vapi voice agent support
+
+### Modern UI Features
+- **Detailed Analysis**: Shows bullshit type, severity, red flags
+- **VC Helper**: Provides specific challenging questions
+- **Real-time Alerts**: Visual and voice notifications
+- **Session Tracking**: Logs all detections and analysis
 
 ### Detection Categories
 - 🏢 **Fake Partnerships**: "We work with Google/Microsoft"

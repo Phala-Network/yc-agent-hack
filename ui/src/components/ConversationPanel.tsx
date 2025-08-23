@@ -1,11 +1,20 @@
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
-import { MessageCircle } from 'lucide-react'
+import { MessageCircle, AlertTriangle } from 'lucide-react'
 
 interface ConversationMessage {
   timestamp: Date
-  speaker: 'user' | 'assistant'
+  speaker: 'user' | 'assistant' | 'detector'
   text: string
+  isBullshit?: boolean
+  bullshitDetails?: {
+    score: number
+    type: string
+    severity: string
+    explanation: string
+    redFlags: string[]
+    voiceResponse: string
+  }
 }
 
 interface ConversationPanelProps {
@@ -21,20 +30,22 @@ export const ConversationPanel = ({ messages, participantCount }: ConversationPa
     })
   }
 
-  const getSpeakerName = (speaker: 'user' | 'assistant') => {
-    return speaker === 'user' ? 'Speaker' : 'Bullshit Detector'
+  const getSpeakerName = (speaker: 'user' | 'assistant' | 'detector') => {
+    if (speaker === 'user') return 'Speaker'
+    if (speaker === 'detector') return '🚨 BS Detector'
+    return 'AI Assistant'
   }
 
-  const getSpeakerColor = (speaker: 'user' | 'assistant') => {
-    return speaker === 'user' 
-      ? 'bg-blue-50 text-blue-700 border-blue-200' 
-      : 'bg-red-50 text-red-700 border-red-200'
+  const getSpeakerColor = (speaker: 'user' | 'assistant' | 'detector') => {
+    if (speaker === 'user') return 'bg-blue-50 text-blue-700 border-blue-200'
+    if (speaker === 'detector') return 'bg-red-600 text-white border-red-600'
+    return 'bg-green-50 text-green-700 border-green-200'
   }
 
-  const getMessageBg = (speaker: 'user' | 'assistant') => {
-    return speaker === 'user'
-      ? 'bg-blue-50 border-blue-100'
-      : 'bg-red-50 border-red-100'
+  const getMessageBg = (speaker: 'user' | 'assistant' | 'detector') => {
+    if (speaker === 'user') return 'bg-blue-50 border-blue-100'
+    if (speaker === 'detector') return 'bg-red-50 border-red-200'
+    return 'bg-green-50 border-green-100'
   }
 
   return (
@@ -81,8 +92,57 @@ export const ConversationPanel = ({ messages, participantCount }: ConversationPa
                         {formatTime(message.timestamp)}
                       </span>
                     </div>
-                    <div className={`rounded-lg p-3 text-xs text-gray-800 leading-relaxed border ${getMessageBg(message.speaker)}`}>
-                      {message.text}
+                    <div className={`rounded-lg p-3 text-xs leading-relaxed border ${getMessageBg(message.speaker)}`}>
+                      {message.isBullshit && message.bullshitDetails ? (
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-2 text-red-700 font-bold text-sm">
+                            <AlertTriangle className="h-4 w-4" />
+                            {message.text}
+                          </div>
+                          
+                          <div className="space-y-2 text-gray-700">
+                            <div className="flex items-start gap-2">
+                              <Badge className="bg-red-500 text-white">
+                                Score: {Math.round(message.bullshitDetails.score * 100)}%
+                              </Badge>
+                              <Badge variant="outline" className="border-red-500 text-red-700">
+                                {message.bullshitDetails.type.replace(/_/g, ' ')}
+                              </Badge>
+                              <Badge variant="outline" className={`
+                                ${message.bullshitDetails.severity === 'extreme' ? 'border-red-600 text-red-600' : ''}
+                                ${message.bullshitDetails.severity === 'high' ? 'border-orange-600 text-orange-600' : ''}
+                                ${message.bullshitDetails.severity === 'medium' ? 'border-yellow-600 text-yellow-600' : ''}
+                                ${message.bullshitDetails.severity === 'low' ? 'border-gray-600 text-gray-600' : ''}
+                              `}>
+                                {message.bullshitDetails.severity}
+                              </Badge>
+                            </div>
+                            
+                            <div className="bg-white/50 rounded p-2">
+                              <p className="font-semibold mb-1">Analysis:</p>
+                              <p>{message.bullshitDetails.explanation}</p>
+                            </div>
+                            
+                            {message.bullshitDetails.redFlags.length > 0 && (
+                              <div className="bg-white/50 rounded p-2">
+                                <p className="font-semibold mb-1">Red Flags:</p>
+                                <ul className="list-disc list-inside space-y-1">
+                                  {message.bullshitDetails.redFlags.map((flag, i) => (
+                                    <li key={i}>{flag}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                            
+                            <div className="bg-yellow-50 border border-yellow-200 rounded p-2">
+                              <p className="font-semibold mb-1 text-yellow-800">VC Response:</p>
+                              <p className="text-yellow-900 italic">"{message.bullshitDetails.voiceResponse}"</p>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <span className="text-gray-800">{message.text}</span>
+                      )}
                     </div>
                   </div>
                 ))}

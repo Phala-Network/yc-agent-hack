@@ -5,6 +5,7 @@ Combines all best features: web search, smart LLM analysis, and multiple interfa
 """
 
 from flask import Flask, render_template, request, jsonify
+from flask_cors import CORS
 import json
 import os
 import asyncio
@@ -38,6 +39,7 @@ class Config:
     CITATIONS_FILE = 'fact_check_citations.json'
 
 app = Flask(__name__)
+CORS(app)  # Enable CORS for all routes
 openai_client = OpenAI(api_key=Config.OPENAI_API_KEY) if Config.OPENAI_API_KEY else None
 
 class SmartBullshitDetector:
@@ -285,6 +287,56 @@ We're already working with 12 Fortune 500 companies including Goldman Sachs and 
 
 Sequoia led our $8M seed round at a $45M valuation, with participation from Andreessen Horowitz and Y Combinator. We have a strategic partnership with Microsoft to integrate directly into GitHub, and they're considering acquiring us for $200 million."""
     })
+
+@app.route('/api/vapi_function', methods=['POST'])
+def vapi_function():
+    """Handle Vapi function calls for bullshit detection"""
+    
+    # Check for Vapi secret token (optional for security)
+    auth_header = request.headers.get('Authorization')
+    if auth_header:
+        # Vapi sends: Authorization: Bearer <secret>
+        expected_secret = "bullshit-detector-secret-2024"  # You can change this
+        if not auth_header.startswith('Bearer ') or auth_header[7:] != expected_secret:
+            return jsonify({'error': 'Unauthorized'}), 401
+    
+    data = request.json
+    console.print(f"[cyan]Received Vapi function call: {data}[/cyan]")
+    
+    # Extract the message from Vapi
+    if data and 'message' in data:
+        message = data['message']
+        
+        if message.get('type') == 'function-call' and message.get('functionCall'):
+            function_name = message['functionCall'].get('name')
+            parameters = message['functionCall'].get('parameters', {})
+            
+            if function_name == 'detectBullshit':
+                text = parameters.get('text', '')
+                
+                # Run async analysis
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                try:
+                    result = loop.run_until_complete(detector.analyze_claim(text))
+                    
+                    # Return response for Vapi to speak
+                    if result['bullshit_score'] > 0.7:
+                        return jsonify({
+                            'result': result['voice_response'],
+                            'detected': True,
+                            'score': result['bullshit_score']
+                        })
+                    else:
+                        return jsonify({
+                            'result': '',
+                            'detected': False,
+                            'score': result['bullshit_score']
+                        })
+                finally:
+                    loop.close()
+    
+    return jsonify({'result': '', 'detected': False})
 
 # Original webhook for teammate integration
 transcript_queue = queue.Queue()
