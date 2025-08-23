@@ -50,11 +50,18 @@ export const VoiceCall = () => {
   const vapiRef = useRef<Vapi | null>(null)
   const timerRef = useRef<NodeJS.Timeout | null>(null)
   const processingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const isCallActiveRef = useRef(isCallActive)
+
+  // Keep ref in sync with state
+  useEffect(() => {
+    isCallActiveRef.current = isCallActive
+  }, [isCallActive])
 
   const handleCallStart = useCallback(() => {
     setIsCallActive(true)
     setStatus('Call started')
     setCallStartTime(new Date())
+    vapiRef.current?.send({type: 'control', control: 'mute-assistant'})
 
     const timer = setInterval(() => {
       setCallDuration((prev) => prev + 1)
@@ -181,28 +188,11 @@ export const VoiceCall = () => {
                 ])
                 
                 // If Vapi is active, make the assistant speak the challenge
-                if (vapiRef.current && isCallActive) {
+                if (vapiRef.current && isCallActiveRef.current) {
                   console.log('🎤 Triggering voice response:', bullshitDetails.voiceResponse)
                   
-                  // Send the message to Vapi using the send method
-                  try {
-                    // Send a system message to trigger the assistant to speak
-                    vapiRef.current.send({
-                      type: 'add-message',
-                      message: {
-                        role: 'system',
-                        content: `INTERRUPT AND SAY: "${bullshitDetails.voiceResponse}"`
-                      }
-                    })
-                    console.log('📤 Sent interrupt command to Vapi')
-                  } catch (error) {
-                    console.error('Failed to send to Vapi:', error)
-                    
-                    // Alternative: Use Vapi's say method if available
-                    if (typeof vapiRef.current.say === 'function') {
-                      vapiRef.current.say(bullshitDetails.voiceResponse)
-                    }
-                  }
+                  vapiRef.current.send({type: 'control', control: 'unmute-assistant'})
+                  vapiRef.current.say(bullshitDetails.voiceResponse)
                 }
               } else {
                 console.log('✅ No bullshit detected. Score:', result?.bullshit_score || 0)
@@ -298,7 +288,10 @@ export const VoiceCall = () => {
         vapiRef.current.on('call-start', handleCallStart)
         vapiRef.current.on('call-end', handleCallEnd)
         vapiRef.current.on('speech-start', () => setStatus('Assistant speaking...'))
-        vapiRef.current.on('speech-end', () => setStatus('Listening...'))
+        vapiRef.current.on('speech-end', () => {
+          setStatus('Listening...');
+          vapiRef.current?.send({type: 'control', control: 'mute-assistant'})
+        })
         vapiRef.current.on('volume-level', setVolumeLevel)
         vapiRef.current.on('message', handleMessage)
         vapiRef.current.on('error', handleError)
